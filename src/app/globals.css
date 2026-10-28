@@ -1,26 +1,422 @@
 @import "tailwindcss";
 
+/* Tokens mirror the Gnars website (shadcn "new-york", neutral). */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.708 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --noggle: #e8312a;
+}
+
+/* Dark tokens: `.dark` is set by next-themes (default "system" = follows the device). */
+.dark {
+  color-scheme: dark;
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --ring: oklch(0.556 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-noggle: var(--noggle);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-padding-top: 5rem;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .btn {
+    @apply inline-flex h-9 shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90;
+  }
+  .btn-outline {
+    @apply border bg-background shadow-xs hover:bg-muted;
+  }
+  .btn-lg {
+    @apply h-11 rounded-lg px-6 text-base font-semibold;
+  }
+  .badge {
+    @apply inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium whitespace-nowrap;
+  }
+  .badge-secondary {
+    @apply border-transparent bg-muted text-foreground;
+  }
+  .badge-open {
+    @apply border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400;
+  }
+  .card {
+    @apply rounded-xl border bg-card shadow-sm;
+  }
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground;
+  }
+  .field {
+    @apply flex flex-col gap-2;
+  }
+  .field > span {
+    @apply text-sm font-medium;
+  }
+  .input {
+    @apply w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50 md:text-sm;
+  }
+}
+
+@custom-variant dark (&:is(.dark *));
+
+/* Selected rail halo on the globe (from gnars.com). */
+@keyframes rail-pin-pulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1.25);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.75);
+    opacity: 0.25;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Surf hero: wave layers drift, the board bobs, clouds pass, the sun glints on the water. */
+.surf-art .wave-layer {
+  animation: wave-drift linear infinite;
+}
+
+.surf-art .board {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: board-bob 3.2s ease-in-out infinite;
+}
+
+.surf-art .cloud {
+  animation: cloud-drift linear infinite;
+}
+
+.surf-art .glint {
+  animation: glint 2.4s ease-in-out infinite;
+}
+
+.surf-art .birds {
+  animation: birds 7s ease-in-out infinite;
+}
+
+.surf-art .spray circle {
+  animation: spray 1.6s ease-out infinite;
+}
+
+@keyframes wave-drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes board-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-5deg);
+  }
+  50% {
+    transform: translateY(-4%) rotate(-1.5deg);
+  }
+}
+
+@keyframes cloud-drift {
+  from {
+    transform: translateX(-140px);
+  }
+  to {
+    transform: translateX(min(100vw, 640px));
+  }
+}
+
+@keyframes glint {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes birds {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(10px, -4px);
+  }
+}
+
+@keyframes spray {
+  from {
+    opacity: 0.9;
+    transform: translate(0, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-10px, -8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .surf-art * {
+    animation: none !important;
+  }
+  .surf-art .board {
+    transform: rotate(-4deg);
+  }
+}
+
+/* ── "Happening now" board ──────────────────────────────────────────────
+   --accent is the sport's color as "r g b" (red rails, blue surf). */
+@property --beam-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@property --prism-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* Noggles Rail colorways, as a ring of light. */
+.fx-board {
+  --prism: #ff2d2d, #ffd400, #2bff00, #38bdf8, #0066ff, #7b2dff, #ff6383, #ff2d2d;
+}
+
+.glow-card {
+  position: relative;
+  isolation: isolate;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.glow-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 40px -24px rgb(var(--accent) / 0.45);
+}
+
+/* Soft spotlight under the cursor. */
+.glow-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), rgb(var(--accent) / 0.09), transparent 45%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+
+/* Prism border: only the part of the border near the cursor lights up. */
+.glow-card::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(from var(--prism-angle), var(--prism));
+  mask:
+    radial-gradient(220px circle at var(--mx, 50%) var(--my, 0%), #000, transparent 70%),
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: intersect, exclude, add;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  animation: prism-spin 8s linear infinite;
+  pointer-events: none;
+}
+
+.glow-card:hover::before,
+.glow-card:hover::after {
+  opacity: 1;
+}
+
+/* A beam of light that travels around a card's border. */
+.beam {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--beam-angle),
+    transparent 0 72%,
+    rgb(var(--accent) / 0.9) 86%,
+    #fff 90%,
+    transparent 94%
+  );
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: beam-spin 7s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes beam-spin {
+  to {
+    --beam-angle: 360deg;
+  }
+}
+
+@keyframes prism-spin {
+  to {
+    --prism-angle: 360deg;
+  }
+}
+
+/* Spinning prism ring around the #1 avatar. */
+.prism-ring {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 2px;
+  background: conic-gradient(from var(--prism-angle), var(--prism));
+  animation: prism-spin 4s linear infinite;
+  box-shadow: 0 0 14px -2px rgb(255 212 0 / 0.55);
+}
+
+/* Live feed: a slow vertical ticker over a doubled list; pauses on hover. */
+.ticker {
+  mask-image: linear-gradient(transparent, #000 12%, #000 82%, transparent);
+}
+
+.ticker-track {
+  animation: ticker-up var(--ticker-duration, 40s) linear infinite;
+}
+
+.ticker:hover .ticker-track {
+  animation-play-state: paused;
+}
+
+@keyframes ticker-up {
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+/* Bars and sparkline grow once the board scrolls into view. */
+.grow-x,
+.grow-y {
+  animation: 0.9s cubic-bezier(0.22, 1, 0.36, 1) both paused;
+}
+
+.grow-x {
+  transform-origin: left;
+  animation-name: grow-x;
+}
+
+.grow-y {
+  transform-origin: bottom;
+  animation-name: grow-y;
+}
+
+.is-visible .grow-x,
+.is-visible .grow-y {
+  animation-play-state: running;
+}
+
+@keyframes grow-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes grow-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+/* Light sweeping across a bar. */
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.55), transparent);
+  transform: translateX(-100%);
+  animation: shimmer 3.2s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes shimmer {
+  60%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track,
+  .beam,
+  .glow-card::after,
+  .prism-ring,
+  .shimmer::after,
+  .grow-x,
+  .grow-y {
+    animation: none !important;
+  }
+  .glow-card:hover {
+    transform: none;
+  }
 }
