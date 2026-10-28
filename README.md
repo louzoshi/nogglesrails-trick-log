@@ -1,25 +1,67 @@
 # ⌐◨-◨ Nogglesrails Trick Log
 
-**Log tricks landed on Gnars Noggles Rails onchain — and turn the clip into a Gnars bounty claim in one tap.**
+**Log skate tricks on Gnars Noggles Rails and waves at surf spots onchain, and turn the clip into a Gnars bounty claim in one tap.**
 
-Gnars DAO funds [Noggles Rails](https://www.gnars.com/nogglesrails): Nouns-shaped skate obstacles installed by local collectives in Rio, Chicago, Nairobi, London, Rome and more. Once a rail is installed, nothing records what happens on it. Trick Log fills that gap:
+**Live:** [nogglesrails-trick-log.vercel.app](https://nogglesrails-trick-log.vercel.app) · Farcaster / Base App mini app, also works in any browser.
 
-1. Pick a rail on the map.
-2. Film the trick (or roll the **Noggle Dice** for a challenge).
-3. The clip goes to IPFS and the trick is logged as an **EAS attestation on Base** (rail, trick, clip, note).
-4. If the rail has an open Gnars bounty, the same flow sends a **`createClaim` to the Gnars bounty contract** (PoidhSopa, the one behind gnars.com/community/bounties). Pool contributors vote and the winners get paid as usual.
+<p align="center">
+  <img src="docs/media/kickflip.gif" alt="3D skateboard with a Noggles graphic popping a kickflip" width="49%" />
+  <img src="docs/media/surf-hero.gif" alt="3D surfboard with noggles riding an illustrated sunset wave" width="45%" />
+</p>
 
-Each rail page shows its clips, its open bounties and a **King of the rail** leaderboard.
+Gnars DAO funds [Noggles Rails](https://www.gnars.com/nogglesrails): Nouns-shaped skate obstacles installed by local collectives in Rio, Chicago, Nairobi, London, Rome and more. Once a rail is installed, nothing records what happens on it. Trick Log fills that gap, and does the same for the surf side of Gnars:
 
-The home globe (ported from gnars.com) pulses red rings over the rails with the most logged tricks: the busier the rail, the wider and faster the rings. The effect is tuned in one place, `src/lib/activity.ts`.
+1. Pick a rail (or a surf spot) on the globe.
+2. Film the trick or the wave (or roll the **Noggle Dice** for a challenge).
+3. The clip goes to IPFS and the log becomes an **EAS attestation on Base** (place, trick, clip, note).
+4. If the place has an open Gnars bounty, the same flow sends a **`createClaim` to the Gnars bounty contract** (PoidhSopa, the one behind gnars.com/community/bounties). Pool contributors vote and the winners get paid as usual.
 
-Built as a Farcaster / Base App mini app that also works in a regular browser.
+> The images below come from **demo mode** (`NEXT_PUBLIC_DEMO_MODE=1`), which fills the app with sample skaters, surfers, clips and bounties. The live deployment shows real onchain data only.
 
-The heroes show a 3D skateboard (which pops a kickflip every few seconds) and a 3D surfboard riding the illustrated wave. Both are built in code with three.js (`src/components/three/`), so they ship no model files and need no third-party licenses. Their graphics use the Noggles Rail colorways.
+## Tour
 
-### Surf
+### Happening now
 
-Gnars is skate *and* surf, so Trick Log has a **Surf** tab (`/surf`). It works the same way, with surf spots in place of rails: log a wave at a spot, see who's in the water, climb the **Local legend** board and claim surf bounties. It uses the same EAS schema and the same bounty contract, so nothing new needs to be deployed. The schema's `rail` field holds the spot slug, and rail and spot slugs share one namespace; a test enforces that. The app starts with 14 well-known breaks (Saquarema, Arpoador, Pipeline, Nazaré…), which are *not* Gnars installations. Adding a spot means adding one entry to `src/lib/surf-spots.ts`. Spots have no photo library yet, so each one gets a generated poster at `/surf/<slug>/cover.png`. Another sport can be added later with one entry in `src/lib/sports.ts` plus its places.
+A live feed of landings, the month's top skaters and the hottest rails of the week. The feed scrolls by itself, counters run up, bars grow, and a prism border follows the cursor.
+
+<p align="center"><img src="docs/media/happening-now.gif" alt="Activity board with live feed, top skaters and hot rails" width="90%" /></p>
+
+### The globe
+
+The globe is ported from gnars.com. Red rings pulse over the rails with the most logged tricks: the busier the rail, the wider and faster the rings. The effect is tuned in one place, `src/lib/activity.ts`.
+
+<p align="center"><img src="docs/media/globe.png" alt="Globe with Noggles Rail pins and activity rings next to a rail panel" width="90%" /></p>
+
+### Rails and spots
+
+Each rail or spot has its own page with its clips, its open bounties, and a **King of the rail** / **Local legend** leaderboard.
+
+| Skate · rail page | Surf · spot page |
+|---|---|
+| <img src="docs/media/rail-page.png" alt="Praça XV rail page" /> | <img src="docs/media/spot-page.png" alt="Itaúna surf spot page" /> |
+
+### Log it
+
+The log form takes the place, the trick or wave, the clip, a note and an optional bounty. It signs, uploads, attests and claims in one flow.
+
+<p align="center"><img src="docs/media/log-form.png" alt="Log a trick form with rail, trick, Noggle Dice and clip upload" width="80%" /></p>
+
+### Skate and Surf, light and dark, on mobile
+
+| Skate | Surf |
+|---|---|
+| <img src="docs/media/hero-skate.png" alt="Skate home, dark theme" /> | <img src="docs/media/hero-surf.png" alt="Surf home, light theme" /> |
+
+<p align="center">
+  <img src="docs/media/mobile-skate.png" alt="Skate home on mobile" width="32%" />
+  <img src="docs/media/mobile-surf.png" alt="Surf home on mobile" width="32%" />
+</p>
+
+### Under the hood
+
+- **3D boards built in code.** The skateboard and the surfboard are generated with three.js (`src/components/three/`), so there are no model files to ship and no third-party licenses. Their graphics use the Noggles Rail colorways, which you can pick with the swatches.
+- **Surf.** Surf spots take the place of rails. They use the same EAS schema and the same bounty contract, so nothing new has to be deployed. The schema's `rail` field holds the spot slug, and a test makes sure rail and spot slugs never collide. The app starts with 14 well-known breaks (Saquarema, Arpoador, Pipeline, Nazaré…); these are *not* Gnars installations. To add a spot, add one entry to `src/lib/surf-spots.ts`. Spots have no photo library yet, so each one gets a generated poster at `/surf/<slug>/cover.png`. Adding another sport means one entry in `src/lib/sports.ts` plus its places.
+- **Theme.** Light, dark and system theme, the same as gnars.com.
 
 ## How it helps Gnars and Nouns
 
@@ -62,6 +104,8 @@ cp .env.example .env.local   # add PINATA_JWT
 pnpm dev
 ```
 
+To see the app full of sample data before anyone has logged anything, set `NEXT_PUBLIC_DEMO_MODE=1` in `.env.local`. A banner marks the page as sample data, and the log form simulates the flow without a wallet, an upload or a transaction.
+
 Clip uploads go browser → Pinata through a one-off signed URL. The wallet signs the upload request first, and smart wallets are supported through ERC-1271/6492 verification. Clip URLs use a gateway that gnars.com already renders inline (`ipfs.skatehive.app` by default).
 
 ```bash
@@ -70,7 +114,7 @@ pnpm typecheck
 pnpm lint
 ```
 
-Stack: Next.js 16 (App Router, Cache Components), wagmi + viem, Farcaster mini app SDK, react-globe.gl, Tailwind 4. The UI follows the Gnars website design tokens.
+Stack: Next.js 16 (App Router, Cache Components), wagmi + viem, Farcaster mini app SDK, react-globe.gl, three.js / react-three-fiber, next-themes, Tailwind 4. The UI follows the Gnars website design tokens.
 
 ## Credits
 
