@@ -4,7 +4,7 @@ import { CircleCheck, ExternalLink, LoaderCircle, Upload } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { parseEventLogs, zeroAddress, zeroHash, type Hex } from "viem";
-import { useAccount, useChainId, useConfig, useSignMessage, useSwitchChain, useWriteContract } from "wagmi";
+import { useAccount, useConfig, useSignMessage, useSwitchChain, useWriteContract } from "wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { ConnectButton } from "@/components/ConnectButton";
 import { NoggleDice } from "@/components/NoggleDice";
@@ -54,8 +54,9 @@ export function LogTrickForm(props: {
   /** Demo mode: walk through the same steps without wallet, upload or transactions. */
   demo?: boolean;
 }) {
-  const { address, isConnected } = useAccount();
-  const chainId = useChainId();
+  // The wallet's actual chain. useChainId() would stay on Base while the wallet sits on a chain
+  // this app doesn't configure (e.g. Ethereum), and the switch below would be skipped.
+  const { address, isConnected, chainId } = useAccount();
   const config = useConfig();
   const { switchChainAsync } = useSwitchChain();
   const { signMessageAsync } = useSignMessage();
@@ -123,6 +124,7 @@ export function LogTrickForm(props: {
 
       setStep("attesting");
       const attestHash = await writeContractAsync({
+        chainId: CHAIN.id, // refuse to send anywhere but Base, even if the wallet switched mid-flow
         address: EAS_ADDRESS,
         abi: EAS_ABI,
         functionName: "attest",
@@ -148,6 +150,7 @@ export function LogTrickForm(props: {
       if (bountyId !== "") {
         setStep("claiming");
         const claimHash = await writeContractAsync({
+          chainId: CHAIN.id,
           address: POIDH_SOPA_ADDRESS,
           abi: POIDH_SOPA_ABI,
           functionName: "createClaim",
