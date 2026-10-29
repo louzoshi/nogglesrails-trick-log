@@ -1,3 +1,4 @@
+import { CLIP_MIME_TYPES } from "@/lib/config";
 import { publicClient } from "@/lib/rpc";
 import { UPLOAD_AUTH_WINDOW_SECONDS, uploadMessage, uploadRequestSchema } from "@/lib/upload-auth";
 
@@ -38,7 +39,9 @@ export async function POST(request: Request) {
       expires: 120,
       filename: upload.filename,
       max_file_size: upload.size,
-      allow_mime_types: [upload.mimeType],
+      // Pinata checks the type it detects in the file, not the one the browser reported. Safari labels
+      // .mov as video/mp4, so allowing only the reported type rejects iPhone clips.
+      allow_mime_types: [...CLIP_MIME_TYPES],
       keyvalues: { wallet: upload.address.toLowerCase(), app: "nogglesrails-trick-log" },
     }),
     signal: AbortSignal.timeout(15_000),

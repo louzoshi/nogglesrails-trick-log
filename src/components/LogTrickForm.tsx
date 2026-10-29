@@ -15,6 +15,7 @@ import { POIDH_SOPA_ABI } from "@/lib/sopa-abi";
 import { SPORTS, type Sport } from "@/lib/sports";
 import { claimDescription } from "@/lib/tags";
 import { RAIL_TRICKS, SURF_MOVES } from "@/lib/tricks";
+import { clipMimeType } from "@/lib/upload-auth";
 import { uploadClip } from "@/lib/upload-client";
 
 export interface FormRail {
@@ -78,7 +79,7 @@ export function LogTrickForm(props: {
 
   function pickFile(f: File | null) {
     setError(null);
-    if (f && !(CLIP_MIME_TYPES as readonly string[]).includes(f.type)) return setError("Use an MP4, MOV or WebM clip.");
+    if (f && !clipMimeType(f)) return setError("Use an MP4, MOV or WebM clip.");
     if (f && f.size > MAX_CLIP_BYTES) return setError("Clip is over 100 MB — trim it first.");
     setFile(f);
   }
@@ -262,7 +263,7 @@ export function LogTrickForm(props: {
           <input
             type="file"
             className="sr-only"
-            accept={CLIP_MIME_TYPES.join(",")}
+            accept={[...CLIP_MIME_TYPES, ".mov", ".mp4", ".m4v", ".webm"].join(",")}
             onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
             disabled={busy}
           />

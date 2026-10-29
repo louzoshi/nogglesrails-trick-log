@@ -1,7 +1,7 @@
 "use client";
 
 import type { Address } from "viem";
-import { uploadMessage, type UploadRequest } from "./upload-auth";
+import { clipMimeType, uploadMessage, type UploadRequest } from "./upload-auth";
 
 export interface UploadedClip {
   cid: string;
@@ -16,7 +16,7 @@ export async function uploadClip(
 ): Promise<UploadedClip> {
   const upload: UploadRequest = {
     filename: file.name.slice(-120) || "clip.mp4",
-    mimeType: file.type as UploadRequest["mimeType"],
+    mimeType: clipMimeType(file) ?? "video/mp4",
     size: file.size,
     address,
     timestamp: Math.floor(Date.now() / 1000),
