@@ -41,9 +41,9 @@ export async function uploadClip(
     });
     xhr.addEventListener("load", () => {
       try {
-        const body = JSON.parse(xhr.responseText) as { data?: { cid?: string } };
+        const body = JSON.parse(xhr.responseText) as { data?: { cid?: string }; error?: { message?: string } };
         if (xhr.status >= 200 && xhr.status < 300 && body.data?.cid) resolve({ cid: body.data.cid });
-        else reject(new Error(`Upload failed (${xhr.status}).`));
+        else reject(new Error(`Upload failed (${xhr.status})${body.error?.message ? `: ${body.error.message}` : "."}`));
       } catch {
         reject(new Error("Upload failed: unreadable response."));
       }

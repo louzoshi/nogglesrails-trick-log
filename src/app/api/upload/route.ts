@@ -38,7 +38,8 @@ export async function POST(request: Request) {
       date: now,
       expires: 120,
       filename: upload.filename,
-      max_file_size: upload.size,
+      // Pinata measures a bit more than the file's own size: an exact limit rejects larger clips.
+      max_file_size: upload.size + 1024 * 1024,
       // Pinata checks the type it detects in the file, not the one the browser reported. Safari labels
       // .mov as video/mp4, so allowing only the reported type rejects iPhone clips.
       allow_mime_types: [...CLIP_MIME_TYPES],
